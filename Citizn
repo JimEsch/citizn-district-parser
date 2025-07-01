@@ -1,3 +1,54 @@
+citizn-district-parser/
+├── public/
+│   └── _redirects
+├── src/
+│   ├── App.js
+│   ├── index.js
+│   ├── DistrictsScreen.js
+│   ├── officialsData.js
+│   └── assets/
+│       └── votercheck-example.png (placeholder)
+/*    /index.html   200
+import React from 'react';
+import DistrictsScreen from './DistrictsScreen';
+
+function App() {
+  return <DistrictsScreen />;
+}
+
+export default App;
+export const officialsData = {
+  congressional_district_2: {
+    office: "U.S. Representative (NE‑2)",
+    name: "Don Bacon",
+    website: "https://bacon.house.gov"
+  },
+  legislative_district_7: {
+    office: "Nebraska State Senator (LD‑7)",
+    name: "Tony Vargas",
+    website: "https://nebraskalegislature.gov"
+  },
+  nrd_papio‑missouri_subdistrict_5: {
+    office: "NRD Director (Papio‑Missouri NRD Subdistrict 5)",
+    name: "Jane Smith",
+    website: "https://papionrd.org"
+  },
+  city_council_district_3: {
+    office: "Omaha City Council (District 3)",
+    name: "Danny Begley",
+    website: "https://cityofomaha.org"
+  },
+  mud_subdivision_2: {
+    office: "MUD Board (Subdivision 2)",
+    name: "Mary Jones",
+    website: "https://mudomaha.com"
+  },
+  school_district_ops_subdistrict_4: {
+    office: "OPS School Board (Subdistrict 4)",
+    name: "Kevin Thomas",
+    website: "https://ops.org"
+  }
+};
 import React, { useState } from 'react';
 import { officialsData } from './officialsData';
 import votercheckScreenshot from './assets/votercheck-example.png';
