@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import './App.css';
+import { officialsData } from './officialsData';
+import votercheckScreenshot from './assets/votercheck-example.png';
 
-function App() {
+function DistrictsScreen() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState(null);
 
@@ -9,60 +10,88 @@ function App() {
     const lines = input.split('\n');
     const result = {};
 
-    for (const line of lines) {
+    lines.forEach(line => {
       const lower = line.toLowerCase();
       if (lower.includes('congressional district')) {
         result.congressional_district = line.split(':')[1].trim();
       } else if (lower.includes('legislative district')) {
         result.legislative_district = line.split(':')[1].trim();
-      } else if (lower.includes('public service commission')) {
-        result.public_service_commission = line.split(':')[1].trim();
-      } else if (lower.includes('state board of education')) {
-        result.state_board_of_education = line.split(':')[1].trim();
       } else if (lower.includes('nrd')) {
-        const match = line.match(/Subdistrict (\d+).*?\((.*?)\)/);
-        if (match) {
-          result.nrd = { subdistrict: match[1], name: match[2] };
-        }
-      } else if (lower.includes('community college')) {
-        result.community_college = line.split(':')[1].trim();
-      } else if (lower.includes('learning community')) {
-        result.learning_community_district = line.split(':')[1].trim();
+        const m = line.match(/Subdistrict (\d+).*?\((.*?)\)/);
+        if (m) result.nrd = { subdistrict: m[1], name: m[2] };
       } else if (lower.includes('city council')) {
         result.city_council_district = line.split(':')[1].trim();
       } else if (lower.includes('mud')) {
         result.mud_subdivision = line.split(':')[1].trim();
       } else if (lower.includes('school district')) {
-        const match = line.match(/School District: (.*?) Subdistrict (\d+)/);
-        if (match) {
-          result.school_district = { name: match[1], subdistrict: match[2] };
-        }
+        const m = line.match(/School District: (.*?) Subdistrict (\d+)/);
+        if (m) result.school_district = { name: m[1], subdistrict: m[2] };
       }
-    }
+    });
 
     setOutput(result);
   };
 
+  const getOfficial = (key) => officialsData[key];
+
+  const displayOfficials = () => {
+    if (!output) return null;
+
+    const results = [];
+    const makeKey = (field, obj = output[field]) => {
+      if (!obj) return null;
+      if (typeof obj === 'string') return `${field}_${obj}`;
+      return `${field}_${obj.name.toLowerCase().replace(/\s+/g, '_')}_subdistrict_${obj.subdistrict}`;
+    };
+
+    Object.keys(output).forEach(field => {
+      const key = makeKey(field);
+      const official = getOfficial(key);
+      if (official) results.push(official);
+    });
+
+    return results.length > 0 ? (
+      <ul>
+        {results.map((o, i) => (
+          <li key={i}>
+            <strong>{o.office}:</strong> {o.name} – <a href={o.website} target="_blank" rel="noreferrer">Website</a>
+          </li>
+        ))}
+      </ul>
+    ) : <p>No matches found. Try updating your list.</p>;
+  };
+
   return (
-    <div className="App">
-      <h2>Paste your VoterCheck district info</h2>
+    <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 800, margin: 'auto' }}>
+      <h1>Find Your Elected Officials</h1>
+      <h2>Step 1: Open VoterCheck</h2>
+      <p>
+        Go to <a href="https://www.votercheck.necvr.ne.gov/VoterView/" target="_blank" rel="noreferrer">Nebraska VoterCheck</a> and click “Search by Name”.
+      </p>
+
+      <h2>Step 2: Copy your districts</h2>
+      <p>Paste the district list below:</p>
+      <img src={votercheckScreenshot} alt="VoterCheck example" style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+
       <textarea
         rows="10"
-        cols="60"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
+        cols="80"
         placeholder="Paste your district list here..."
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        style={{ width: '100%', fontFamily: 'monospace' }}
       />
       <br />
-      <button onClick={handleParse}>Parse Districts</button>
+      <button onClick={handleParse} style={{ marginTop: '10px' }}>Parse</button>
+
       {output && (
         <>
-          <h3>Parsed Output:</h3>
-          <pre>{JSON.stringify(output, null, 2)}</pre>
+          <h2>Your Elected Officials</h2>
+          {displayOfficials()}
         </>
       )}
     </div>
   );
 }
 
-export default App;
+export default DistrictsScreen;
