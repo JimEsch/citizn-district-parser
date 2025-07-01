@@ -1,0 +1,68 @@
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState(null);
+
+  const handleParse = () => {
+    const lines = input.split('\n');
+    const result = {};
+
+    for (const line of lines) {
+      const lower = line.toLowerCase();
+      if (lower.includes('congressional district')) {
+        result.congressional_district = line.split(':')[1].trim();
+      } else if (lower.includes('legislative district')) {
+        result.legislative_district = line.split(':')[1].trim();
+      } else if (lower.includes('public service commission')) {
+        result.public_service_commission = line.split(':')[1].trim();
+      } else if (lower.includes('state board of education')) {
+        result.state_board_of_education = line.split(':')[1].trim();
+      } else if (lower.includes('nrd')) {
+        const match = line.match(/Subdistrict (\d+).*?\((.*?)\)/);
+        if (match) {
+          result.nrd = { subdistrict: match[1], name: match[2] };
+        }
+      } else if (lower.includes('community college')) {
+        result.community_college = line.split(':')[1].trim();
+      } else if (lower.includes('learning community')) {
+        result.learning_community_district = line.split(':')[1].trim();
+      } else if (lower.includes('city council')) {
+        result.city_council_district = line.split(':')[1].trim();
+      } else if (lower.includes('mud')) {
+        result.mud_subdivision = line.split(':')[1].trim();
+      } else if (lower.includes('school district')) {
+        const match = line.match(/School District: (.*?) Subdistrict (\d+)/);
+        if (match) {
+          result.school_district = { name: match[1], subdistrict: match[2] };
+        }
+      }
+    }
+
+    setOutput(result);
+  };
+
+  return (
+    <div className="App">
+      <h2>Paste your VoterCheck district info</h2>
+      <textarea
+        rows="10"
+        cols="60"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Paste your district list here..."
+      />
+      <br />
+      <button onClick={handleParse}>Parse Districts</button>
+      {output && (
+        <>
+          <h3>Parsed Output:</h3>
+          <pre>{JSON.stringify(output, null, 2)}</pre>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default App;
